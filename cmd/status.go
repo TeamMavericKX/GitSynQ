@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -37,7 +38,7 @@ func runStatus(cmd *cobra.Command, args []string) {
 
 	// Remote status
 	ui.Cyan.Println("\n═══ REMOTE SERVER ═══")
-	printRemoteStatus(cfg)
+	printRemoteStatus(cmd.Context(), cfg)
 
 	// Sync recommendation
 	ui.Cyan.Println("\n═══ RECOMMENDATION ═══")
@@ -69,7 +70,7 @@ func printLocalStatus() {
 	}
 }
 
-func printRemoteStatus(cfg *config.Config) {
+func printRemoteStatus(ctx context.Context, cfg *config.Config) {
 	s := spinner.New(spinner.CharSets[14], 100*time.Millisecond)
 	s.Suffix = " Checking remote server..."
 	s.Start()
@@ -103,7 +104,7 @@ func printRemoteStatus(cfg *config.Config) {
 		fi
 	`, repoPath, repoPath)
 
-	output, err := client.Run(cmd.Context(), checkScript)
+	output, err := client.Run(ctx, checkScript)
 	s.Stop()
 
 	if err != nil {
