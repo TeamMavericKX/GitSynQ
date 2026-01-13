@@ -8,6 +8,7 @@ import (
 
 	"github.com/princetheprogrammerbtw/gitsynq/internal/config"
 	"github.com/princetheprogrammerbtw/gitsynq/internal/ssh"
+	"github.com/princetheprogrammerbtw/gitsynq/internal/ui"
 	"github.com/spf13/cobra"
 )
 
@@ -23,17 +24,17 @@ func runDiff(cmd *cobra.Command, args []string) {
 	
 	cfg, err := config.Load()
 	if err != nil {
-		red.Printf("❌ Error loading config: %v\n", err)
+		ui.Red.Printf("❌ Error loading config: %v\n", err)
 		os.Exit(1)
 	}
 
-	cyan.Println("\n🔍 Comparing local branch with remote server...")
+	ui.Cyan.Println("\n🔍 Comparing local branch with remote server...")
 
 	// Step 1: Connect to server to get last commit
 	client, err := ssh.NewClient(cfg.Server)
 	if err != nil {
-		red.Printf("❌ Failed to connect to server: %v\n", err)
-		yellow.Println("   💡 Showing diff against local origin tracking branch instead.")
+		ui.Red.Printf("❌ Failed to connect to server: %v\n", err)
+		ui.Yellow.Println("   💡 Showing diff against local origin tracking branch instead.")
 		showLocalDiff(cfg.Project.Branch)
 		return
 	}
@@ -42,7 +43,7 @@ func runDiff(cmd *cobra.Command, args []string) {
 	repoPath := fmt.Sprintf("%s/%s", cfg.Server.RemotePath, cfg.Project.Name)
 	output, err := client.Run(fmt.Sprintf("cd %s && git rev-parse HEAD", repoPath))
 	if err != nil {
-		red.Printf("❌ Failed to get remote state: %v\n", err)
+		ui.Red.Printf("❌ Failed to get remote state: %v\n", err)
 		return
 	}
 
