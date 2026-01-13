@@ -59,6 +59,7 @@ func init() {
 	rootCmd.AddCommand(watchCmd)
 	rootCmd.AddCommand(diffCmd)
 	rootCmd.AddCommand(historyCmd)
+	rootCmd.AddCommand(backupCmd)
 }
 
 func initConfig() {
