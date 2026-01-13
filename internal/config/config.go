@@ -38,7 +38,7 @@ type BundleConfig struct {
 }
 
 // ConfigFile is the default name for the GitSynq configuration file.
-const ConfigFile = ".gitsync.yaml"
+var ConfigFile = ".gitsync.yaml"
 
 // Load reads and parses the configuration file from the current directory.
 func Load() (*Config, error) {
