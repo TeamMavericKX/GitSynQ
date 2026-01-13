@@ -20,65 +20,65 @@ var initCmd = &cobra.Command{
 
 func runInit(cmd *cobra.Command, args []string) {
 	printBanner()
-	green.Println("\n🎯 Initializing GitSync Configuration")
+	ui.Green.Println("\n🎯 Initializing GitSync Configuration")
 
 	reader := bufio.NewReader(os.Stdin)
 	var projectName, serverIP, username, remotePath string
 
 	// Check if we're in a git repo
 	if _, err := os.Stat(".git"); os.IsNotExist(err) {
-		red.Println("❌ Error: Not a git repository!")
-		yellow.Println("💡 Run 'git init' first or navigate to a git repository")
+		ui.Red.Println("❌ Error: Not a git repository!")
+		ui.Yellow.Println("💡 Run 'git init' first or navigate to a git repository")
 		os.Exit(1)
 	}
 
 	// Get project name
 	for {
-		cyan.Print("📁 Project name: ")
+		ui.Cyan.Print("📁 Project name: ")
 		projectName, _ = reader.ReadString('\n')
 		projectName = strings.TrimSpace(projectName)
 		if projectName != "" {
 			break
 		}
-		red.Println("❌ Project name cannot be empty")
+		ui.Red.Println("❌ Project name cannot be empty")
 	}
 
 	// Get server details
 	for {
-		cyan.Print("🖥️  Server IP/Hostname (e.g., 192.168.12.4): ")
+		ui.Cyan.Print("🖥️  Server IP/Hostname (e.g., 192.168.12.4): ")
 		serverIP, _ = reader.ReadString('\n')
 		serverIP = strings.TrimSpace(serverIP)
 		if serverIP != "" {
 			break
 		}
-		red.Println("❌ Server IP/Hostname cannot be empty")
+		ui.Red.Println("❌ Server IP/Hostname cannot be empty")
 	}
 
 	for {
-		cyan.Print("👤 Server username (e.g., prince): ")
+		ui.Cyan.Print("👤 Server username (e.g., prince): ")
 		username, _ = reader.ReadString('\n')
 		username = strings.TrimSpace(username)
 		if username != "" {
 			break
 		}
-		red.Println("❌ Username cannot be empty")
+		ui.Red.Println("❌ Username cannot be empty")
 	}
 
 	for {
-		cyan.Print("📂 Remote project path (e.g., ~/projects): ")
+		ui.Cyan.Print("📂 Remote project path (e.g., ~/projects): ")
 		remotePath, _ = reader.ReadString('\n')
 		remotePath = strings.TrimSpace(remotePath)
 		if remotePath != "" {
 			break
 		}
-		red.Println("❌ Remote path cannot be empty")
+		ui.Red.Println("❌ Remote path cannot be empty")
 	}
 
-	cyan.Print("🔑 SSH key path (leave empty for default): ")
+	ui.Cyan.Print("🔑 SSH key path (leave empty for default): ")
 	sshKeyPath, _ := reader.ReadString('\n')
 	sshKeyPath = strings.TrimSpace(sshKeyPath)
 
-	cyan.Print("🌿 Main branch name (default: main): ")
+	ui.Cyan.Print("🌿 Main branch name (default: main): ")
 	mainBranch, _ := reader.ReadString('\n')
 	mainBranch = strings.TrimSpace(mainBranch)
 	if mainBranch == "" {
@@ -107,7 +107,7 @@ func runInit(cmd *cobra.Command, args []string) {
 
 	// Save config
 	if err := config.Save(cfg); err != nil {
-		red.Printf("❌ Error saving config: %v\n", err)
+		ui.Red.Printf("❌ Error saving config: %v\n", err)
 		os.Exit(1)
 	}
 
@@ -117,9 +117,9 @@ func runInit(cmd *cobra.Command, args []string) {
 	// Add to .gitignore
 	addToGitignore()
 
-	green.Println("\n✅ GitSync initialized successfully!")
-	cyan.Println("\n📋 Configuration saved to .gitsync.yaml")
-	yellow.Println("\n🚀 Next steps:")
+	ui.Green.Println("\n✅ GitSync initialized successfully!")
+	ui.Cyan.Println("\n📋 Configuration saved to .gitsync.yaml")
+	ui.Yellow.Println("\n🚀 Next steps:")
 	fmt.Println("   1. Run 'gitsync push' to sync repo to server")
 	fmt.Println("   2. Work on the server")
 	fmt.Println("   3. Run 'gitsync pull' to get changes back")
