@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/princetheprogrammerbtw/gitsynq/internal/config"
+	"github.com/princetheprogrammerbtw/gitsynq/internal/ui"
 	"github.com/spf13/cobra"
 )
 

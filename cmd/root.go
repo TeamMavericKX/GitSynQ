@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/fatih/color"
+	"github.com/princetheprogrammerbtw/gitsynq/internal/ui"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -12,13 +12,6 @@ var (
 	version = "1.0.0" // default version, can be overridden by ldflags
 	cfgFile string
 	verbose bool
-
-	// Colors
-	cyan    = color.New(color.FgCyan, color.Bold)
-	green   = color.New(color.FgGreen, color.Bold)
-	red     = color.New(color.FgRed, color.Bold)
-	yellow  = color.New(color.FgYellow, color.Bold)
-	magenta = color.New(color.FgMagenta, color.Bold)
 )
 
 var rootCmd = &cobra.Command{
@@ -81,7 +74,7 @@ func initConfig() {
 }
 
 func printBanner() {
-	magenta.Println(`
+	ui.Magenta.Println(`
   ╔═══════════════════════════════════════╗
   ║         🔄 GITSYNC v1.0.0 🔄          ║
   ║   Air-Gapped Git Synchronization      ║
