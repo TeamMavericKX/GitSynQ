@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/fsnotify/fsnotify"
+	"github.com/princetheprogrammerbtw/gitsynq/internal/ui"
 	"github.com/spf13/cobra"
 )
 
@@ -19,11 +20,11 @@ var watchCmd = &cobra.Command{
 
 func runWatch(cmd *cobra.Command, args []string) {
 	printBanner()
-	green.Println("\n👀 Watching for changes... (Press Ctrl+C to stop)")
+	ui.Green.Println("\n👀 Watching for changes... (Press Ctrl+C to stop)")
 
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		red.Printf("❌ Failed to create watcher: %v\n", err)
+		ui.Red.Printf("❌ Failed to create watcher: %v\n", err)
 		os.Exit(1)
 	}
 	defer watcher.Close()
@@ -46,18 +47,18 @@ func runWatch(cmd *cobra.Command, args []string) {
 						timer.Stop()
 					}
 					timer = time.AfterFunc(delay, func() {
-						cyan.Printf("\n🔄 Change detected in %s. Syncing...\n", event.Name)
+						ui.Cyan.Printf("\n🔄 Change detected in %s. Syncing...\n", event.Name)
 						// We need a way to auto-commit or just push if commits exist
 						// For now, let's just trigger a normal push
 						runPush(cmd, args)
-						green.Println("\n👀 Still watching...")
+						ui.Green.Println("\n👀 Still watching...")
 					})
 				}
 			case err, ok := <-watcher.Errors:
 				if !ok {
 					return
 				}
-				red.Printf("❌ Watcher error: %v\n", err)
+				ui.Red.Printf("❌ Watcher error: %v\n", err)
 			}
 		}
 	}()
@@ -81,7 +82,7 @@ func runWatch(cmd *cobra.Command, args []string) {
 	})
 
 	if err != nil {
-		red.Printf("❌ Failed to walk directory: %v\n", err)
+		ui.Red.Printf("❌ Failed to walk directory: %v\n", err)
 		os.Exit(1)
 	}
 
