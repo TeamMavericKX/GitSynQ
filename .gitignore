@@ -1,0 +1,17 @@
+# Binaries
+/build/
+/gitsync
+
+# Config
+.gitsync.yaml
+
+# Bundles
+.gitsync-bundles/
+*.bundle
+
+# OS
+.DS_Store
+
+# Go
+vendor/
+go.sum
