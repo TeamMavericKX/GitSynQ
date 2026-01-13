@@ -12,6 +12,7 @@ import (
 	"github.com/princetheprogrammerbtw/gitsynq/internal/bundle"
 	"github.com/princetheprogrammerbtw/gitsynq/internal/config"
 	"github.com/princetheprogrammerbtw/gitsynq/internal/ssh"
+	"github.com/princetheprogrammerbtw/gitsynq/internal/ui"
 	"github.com/princetheprogrammerbtw/gitsynq/pkg/utils"
 	"github.com/spf13/cobra"
 )
@@ -37,12 +38,12 @@ func init() {
 
 func runPull(cmd *cobra.Command, args []string) {
 	printBanner()
-	green.Println("\n📥 Pulling from Remote Server")
+	ui.Green.Println("\n📥 Pulling from Remote Server")
 
 	// Load config
 	cfg, err := config.Load()
 	if err != nil {
-		red.Printf("❌ Error loading config: %v\n", err)
+		ui.Red.Printf("❌ Error loading config: %v\n", err)
 		os.Exit(1)
 	}
 
@@ -55,13 +56,13 @@ func runPull(cmd *cobra.Command, args []string) {
 	client, err := ssh.NewClient(cfg.Server)
 	if err != nil {
 		s.Stop()
-		red.Printf("❌ SSH connection failed: %v\n", err)
+		ui.Red.Printf("❌ SSH connection failed: %v\n", err)
 		os.Exit(1)
 	}
 	defer client.Close()
 
 	s.Stop()
-	green.Println("✅ Connected to server")
+	ui.Green.Println("✅ Connected to server")
 
 	// Step 2: Create bundle on server
 	s.Suffix = " Creating bundle on server..."
@@ -90,19 +91,19 @@ func runPull(cmd *cobra.Command, args []string) {
 	s.Stop()
 
 	if strings.Contains(output, "UNCOMMITTED_CHANGES") {
-		yellow.Println("⚠️  Warning: Uncommitted changes exist on the remote server.")
-		yellow.Println("   These changes will NOT be included in the sync until you commit them on the server.")
+		ui.Yellow.Println("⚠️  Warning: Uncommitted changes exist on the remote server.")
+		ui.Yellow.Println("   These changes will NOT be included in the sync until you commit them on the server.")
 	}
 
 	if err != nil || !strings.Contains(output, "BUNDLE_CREATED") {
-		red.Printf("❌ Failed to create bundle on server: %v\n", err)
+		ui.Red.Printf("❌ Failed to create bundle on server: %v\n", err)
 		if verbose {
 			fmt.Println("Output:", output)
 		}
 		os.Exit(1)
 	}
 
-	green.Println("✅ Bundle created on server")
+	ui.Green.Println("✅ Bundle created on server")
 
 	// Step 3: Download bundle
 	s.Suffix = " Downloading bundle..."
@@ -123,12 +124,12 @@ func runPull(cmd *cobra.Command, args []string) {
 	})
 
 	if err != nil {
-		red.Printf("❌ Download failed: %v\n", err)
+		ui.Red.Printf("❌ Download failed: %v\n", err)
 		os.Exit(1)
 	}
 
 	info, _ := os.Stat(localBundlePath)
-	green.Printf("\n✅ Downloaded: %s (%s)\n", remoteBundleName, utils.FormatBytes(info.Size()))
+	ui.Green.Printf("\n✅ Downloaded: %s (%s)\n", remoteBundleName, utils.FormatBytes(info.Size()))
 
 	// Step 4: Merge bundle into local repo
 	s.Suffix = " Merging changes..."
@@ -136,13 +137,13 @@ func runPull(cmd *cobra.Command, args []string) {
 
 	if err := bundle.Merge(localBundlePath, cfg.Project.Branch); err != nil {
 		s.Stop()
-		red.Printf("❌ Merge failed: %v\n", err)
-		yellow.Println("💡 You may need to resolve conflicts manually")
+		ui.Red.Printf("❌ Merge failed: %v\n", err)
+		ui.Yellow.Println("💡 You may need to resolve conflicts manually")
 		os.Exit(1)
 	}
 
 	s.Stop()
-	green.Println("✅ Changes merged successfully!")
+	ui.Green.Println("✅ Changes merged successfully!")
 
 	// Step 5: Cleanup remote bundle
 	s.Suffix = " Cleaning up..."
@@ -157,11 +158,11 @@ func runPull(cmd *cobra.Command, args []string) {
 
 		if err := bundle.PushToOrigin(cfg.Project.Branch); err != nil {
 			s.Stop()
-			yellow.Printf("⚠️  Push to origin failed: %v\n", err)
-			yellow.Println("💡 Run 'git push origin " + cfg.Project.Branch + "' manually")
+			ui.Yellow.Printf("⚠️  Push to origin failed: %v\n", err)
+			ui.Yellow.Println("💡 Run 'git push origin " + cfg.Project.Branch + "' manually")
 		} else {
 			s.Stop()
-			green.Println("✅ Pushed to origin!")
+			ui.Green.Println("✅ Pushed to origin!")
 		}
 	}
 
@@ -170,15 +171,15 @@ func runPull(cmd *cobra.Command, args []string) {
 }
 
 func printPullSuccess(cfg *config.Config, pushed bool) {
-	green.Println("\n" + strings.Repeat("═", 50))
-	green.Println("          🎉 PULL SUCCESSFUL! 🎉")
-	green.Println(strings.Repeat("═", 50))
+	ui.Green.Println("\n" + strings.Repeat("═", 50))
+	ui.Green.Println("          🎉 PULL SUCCESSFUL! 🎉")
+	ui.Green.Println(strings.Repeat("═", 50))
 
-	cyan.Println("\n📊 Latest commits:")
+	ui.Cyan.Println("\n📊 Latest commits:")
 	bundle.ShowRecentCommits(5)
 
 	if !pushed {
-		yellow.Println("\n💡 Don't forget to push to GitHub:")
+		ui.Yellow.Println("\n💡 Don't forget to push to GitHub:")
 		fmt.Println("   git push origin", cfg.Project.Branch)
 	}
 }
