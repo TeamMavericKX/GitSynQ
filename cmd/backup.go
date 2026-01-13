@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/briandowns/spinner"
+	"github.com/princetheprogrammerbtw/gitsynq/internal/ui"
 	"github.com/schollz/progressbar/v3"
 	"github.com/princetheprogrammerbtw/gitsynq/internal/config"
 	"github.com/princetheprogrammerbtw/gitsynq/internal/ssh"
@@ -23,11 +24,11 @@ var backupCmd = &cobra.Command{
 
 func runBackup(cmd *cobra.Command, args []string) {
 	printBanner()
-	green.Println("\n🛡️  Backing up Remote Repository")
+	ui.Green.Println("\n🛡️  Backing up Remote Repository")
 
 	cfg, err := config.Load()
 	if err != nil {
-		red.Printf("❌ Error loading config: %v\n", err)
+		ui.Red.Printf("❌ Error loading config: %v\n", err)
 		os.Exit(1)
 	}
 
@@ -38,13 +39,13 @@ func runBackup(cmd *cobra.Command, args []string) {
 	client, err := ssh.NewClient(cfg.Server)
 	if err != nil {
 		s.Stop()
-		red.Printf("❌ Connection failed: %v\n", err)
+		ui.Red.Printf("❌ Connection failed: %v\n", err)
 		os.Exit(1)
 	}
 	defer client.Close()
 
 	s.Stop()
-	green.Println("✅ Connected")
+	ui.Green.Println("✅ Connected")
 
 	s.Suffix = " Creating full backup bundle on server..."
 	s.Start()
@@ -58,14 +59,11 @@ func runBackup(cmd *cobra.Command, args []string) {
 	s.Stop()
 
 	if err != nil {
-		red.Printf("❌ Remote backup failed: %v\n", err)
+		ui.Red.Printf("❌ Remote backup failed: %v\n", err)
 		os.Exit(1)
 	}
 
-	green.Println("✅ Backup bundle created on server")
-
-	s.Suffix = " Downloading backup..."
-	s.Start()
+	ui.Green.Println("✅ Backup bundle created on server")
 
 	backupDir := "backups"
 	os.MkdirAll(backupDir, 0755)
@@ -84,12 +82,12 @@ func runBackup(cmd *cobra.Command, args []string) {
 	})
 
 	if err != nil {
-		red.Printf("❌ Download failed: %v\n", err)
+		ui.Red.Printf("❌ Download failed: %v\n", err)
 		os.Exit(1)
 	}
 
 	info, _ := os.Stat(localBackupPath)
-	green.Printf("\n✅ Backup saved: %s (%s)\n", localBackupPath, utils.FormatBytes(info.Size()))
+	ui.Green.Printf("\n✅ Backup saved: %s (%s)\n", localBackupPath, utils.FormatBytes(info.Size()))
 
 	// Cleanup remote
 	client.Run(fmt.Sprintf("rm -f %s", remoteBackupPath))
